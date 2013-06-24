@@ -58,6 +58,8 @@ namespace les
 		void setMsgOstream(ostream* os);
 
 		int open(const char* programName, u_long flags);
+		int log(const char* info, ...);
+		int log(const char* info, va_list argp);
 
 	private:
 		CLogMsg(void);

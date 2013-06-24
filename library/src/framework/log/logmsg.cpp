@@ -10,6 +10,7 @@ namespace les
 		_msg(NULL)
 	{
 		_msg = new char[MAXPATHLEN + 1];
+		::memset(_msg, 0, MAXPATHLEN + 1);
 	}
 
 	CLogMsg::~CLogMsg(void)
@@ -79,6 +80,12 @@ namespace les
 	char* CLogMsg::getMsg(void) const
 	{
 		return this->_msg;
+	}
+
+	void CLogMsg::setMsg(const char* msg)
+	{
+		::memset(_msg, 0, MAXPATHLEN + 1);
+		::strncpy(_msg, msg, MAXPATHLEN + 1);
 	}
 
 
