@@ -40,8 +40,37 @@ void arg_test(int i, ...)
 	j = *(int*)arg_ptr;
 }
 
+class CA
+{
+public:
+	CA() : _ms(0)
+	{
+
+	}
+	~CA()
+	{
+	}
+
+	void set(const char* m)
+	{
+		_ms = m;
+	}
+
+	const char* get() const
+	{
+		return _ms;
+	}
+protected:
+private:
+	const char* _ms;
+};
+
 int main(int argc, char *argv[])   
 {
+	char des[] = "Hello,i am!";
+	char source[] = "abc\0def";
+	strncpy(des,source,5);
+
 	arg_test(400000,1,2,3,10);
 
 	stringstream k;
@@ -59,7 +88,7 @@ int main(int argc, char *argv[])
 	ACE_LOG_MSG->open(0, ACE_Log_Msg::OSTREAM | ACE_Log_Msg::STDERR);
 
 
-	ACE_OSTREAM_TYPE *output = new std::ofstream ("library.txt");
+	ostream *output = new std::ofstream ("library.txt");
 	ACE_LOG_MSG->msg_ostream (output, 0);
 	
 	ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("nihao")));
@@ -68,9 +97,9 @@ int main(int argc, char *argv[])
 	//cout << ::GetCurrentThreadId() << endl;
 	//cout << ::getpid() << endl;
 	//ACE_LOG_MSG->clr_flags (ACE_Log_Msg::OSTREAM);
-	while (1)
-	{
-		;
-	}
+	//while (1)
+	//{
+	//	;
+	//}
  	return 0;
 }

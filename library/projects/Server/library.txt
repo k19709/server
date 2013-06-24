@@ -1,5 +1,5 @@
-nihaoThis will go to STDERR
-(4348) calling main in file `f:\github\server\library\src\server\servermain.cpp' on line 66
-   (4348) calling foo in file `f:\github\server\library\src\server\servermain.cpp' on line 18
+nihao(3484) calling main in file `f:\github\server\library\src\server\servermain.cpp' on line 95
+   (3484) calling foo in file `f:\github\server\library\src\server\servermain.cpp' on line 19
         Howdy Pardner
-   (4348) leaving foo
+   (3484) leaving foo
+(3484) leaving main
