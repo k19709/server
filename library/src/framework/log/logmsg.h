@@ -1,7 +1,9 @@
 #ifndef _LES_LOG_MSG_H_
 #define _LES_LOG_MSG_H_
+
 #include "config.h"
 #include "common.h"
+#include "log/logrecord.h"
 
 namespace les
 {
@@ -17,12 +19,11 @@ namespace les
 #define LES_DEBUG(X) \
 	do \
 	{\
+	CLogMsg* ____ = CLogMsg::instance();\
+	____->getStr() << X;\
+	____->log();\
 	} while (0);
 #endif
-#endif
-
-#if !defined(MAXLOGMSGLEN)
-#define MAXPATHLEN 4*1024
 #endif
 
 #define LES_LOG_MSG CLogMsg::instance()
@@ -33,8 +34,8 @@ namespace les
 		// log flags
 		enum
 		{
-			STDERR	= 1,	//write msg to stderr
-			STREAM	= 2,	//write msg to stream
+			STDOUT		= 1,	//write msg to stdout
+			OFSTREAM	= 2,	//write msg to ofstream
 		};
 
 		static CLogMsg* instance(void);
@@ -48,18 +49,22 @@ namespace les
 		const char* getDir(void) const;
 		void makeDir(const char* dir);
 
-		const char* getFileName(void) const;
-		void setFileName(const char* file);
+		const char* getLogName(void) const;
+		void setLogName(const char* name);
 
-		char* getMsg(void) const;
-		void setMsg(const char* msg);
+		ostringstream& getStr(void);
+		void setStr(const char* str);
 
-		ostream* getMsgOstream(void) const;
-		void setMsgOstream(ostream* os);
+		void clrFlags(u_long f);
+		void setFlags(u_long f);
 
-		int open(const char* programName, u_long flags);
-		int log(const char* info, ...);
-		int log(const char* info, va_list argp);
+		u_int getPID(void);
+		u_int getThreadId(void);
+
+		void open(const char* progName, u_long flags);
+		void log(void);
+		void log(const char* msg);
+		void log(CLogRecord& logRecord);
 
 	private:
 		CLogMsg(void);
@@ -68,14 +73,15 @@ namespace les
 	private:
 		bool _traceEnabled;
 		bool _traceActive;
-		const char* _dir;
-		const char* _fileName;
-		char* _msg;
-		ostream* _msgOstream;
-
-		static const char* _programName;
-		static u_long _flags;
 		
+		const char* _dir;
+		const char* _logName;
+		
+		ostringstream _ostr;
+		ofstream _ofs;
+
+		static const char* _progName;
+		static u_long _flags;
 	};
 }
 

@@ -5,6 +5,10 @@
 
 namespace les
 {
+#if !defined(LES_TRACE)
+#define LES_TRACE(X) CTrace ____(X, __LINE__, __FILE__);
+#endif
+
 	class CTrace
 	{
 	public:
@@ -31,9 +35,6 @@ namespace les
 			DEFAULT_TRACE	= 1,
 		};
 	};
-
-#define LES_TRACE(X) CTrace ____(X, __LINE__, __FILE__)
-
 }
 
 #endif

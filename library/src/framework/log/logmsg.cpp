@@ -1,24 +1,25 @@
 #include "log/logmsg.h"
+#include <direct.h>
+#include <process.h>
 
 namespace les
 {
+	const char* CLogMsg::_progName = NULL;
+	u_long CLogMsg::_flags = 0;
+
 	CLogMsg::CLogMsg(void) :
 		_traceEnabled(true),
 		_traceActive(false),
 		_dir(NULL),
-		_fileName(NULL),
-		_msg(NULL)
+		_logName(NULL),
+		_ostr(),
+		_ofs()
 	{
-		_msg = new char[MAXPATHLEN + 1];
-		::memset(_msg, 0, MAXPATHLEN + 1);
+		_ofs.flush();
 	}
 
 	CLogMsg::~CLogMsg(void)
 	{
-		if (NULL != this->_msg)
-		{
-			delete[] this->_msg;
-		}
 	}
 
 	CLogMsg* CLogMsg::instance(void)
@@ -54,68 +55,116 @@ namespace les
 
 	void CLogMsg::makeDir(const char* dir)
 	{
+		mkdir(dir);
 		this->_dir = dir;
 	}
 
-	const char* CLogMsg::getFileName(void) const
+	const char* CLogMsg::getLogName(void) const
 	{
-		return this->_fileName;
+		return this->_logName;
 	}
 
-	void CLogMsg::setFileName(const char* file)
+	void CLogMsg::setLogName(const char* name)
 	{
-		this->_fileName = file;
+		this->_logName = name;
 	}
 
-	ostream* CLogMsg::getMsgOstream(void) const
+	ostringstream& CLogMsg::getStr(void)
 	{
-		return this->_msgOstream;
+		return this->_ostr;
 	}
 
-	void CLogMsg::setMsgOstream(ostream* os)
+	void CLogMsg::setStr(const char* str)
 	{
-		this->_msgOstream = os;
+		this->_ostr.str("");
+		this->_ostr << str;
 	}
 
-	char* CLogMsg::getMsg(void) const
+	void CLogMsg::clrFlags(u_long f)
 	{
-		return this->_msg;
+		LES_CLR_BITS(CLogMsg::_flags, f);
 	}
 
-	void CLogMsg::setMsg(const char* msg)
+	void CLogMsg::setFlags(u_long f)
 	{
-		::memset(_msg, 0, MAXPATHLEN + 1);
-		::strncpy(_msg, msg, MAXPATHLEN + 1);
+		LES_SET_BITS(CLogMsg::_flags, f);
 	}
 
-
-
-	int CLogMsg::open(const char* programName, u_long flags)
+	u_int CLogMsg::getPID(void)
 	{
-		if (NULL != programName)
+		return ::getpid();
+	}
+
+	u_int CLogMsg::getThreadId(void)
+	{
+		return ::GetCurrentThreadId();
+	}
+
+	void CLogMsg::open(const char* progName, u_long flags)
+	{
+		if (NULL != progName)
 		{
-			CLogMsg::_programName = programName;
+			CLogMsg::_progName = progName;
 		}
-		else if (NULL == programName)
+		else if (NULL == progName)
 		{
-			CLogMsg::_programName = "<unknown>";
-		}
-
-		if (LES_BIT_ENABLED(flags, STDERR))
-		{
-			LES_SET_BITS(CLogMsg::_flags, STDERR);
-		}
-
-		if (LES_BIT_ENABLED(flags, STREAM))
-		{
-			LES_SET_BITS(CLogMsg::_flags, STREAM);
-			this->setMsgOstream(&std::cerr);
+			CLogMsg::_progName = "<unknown>";
 		}
 
-		return 0;
+		if (LES_BIT_ENABLED(flags, STDOUT))
+		{
+			LES_SET_BITS(CLogMsg::_flags, STDOUT);
+		}
+
+		if (LES_BIT_ENABLED(flags, OFSTREAM))
+		{
+			LES_SET_BITS(CLogMsg::_flags, OFSTREAM);
+		}
 	}
 
+	void CLogMsg::log(void)
+	{
+		CLogRecord logRecord(this->getPID(), this->getThreadId());
+		logRecord.setData(this->_ostr.str().c_str());
+		this->_ostr.str("");
+		this->log(logRecord);
+	}
 
+	void CLogMsg::log(const char* msg)
+	{
+		this->setStr(msg);
+		this->log();
+	}
 
+	void CLogMsg::log(CLogRecord& logRecord)
+	{
+		if (LES_BIT_ENABLED(CLogMsg::_flags, STDOUT))
+		{
+			logRecord.print(stdout);
+		}
 
+		if (LES_BIT_ENABLED(CLogMsg::_flags, OFSTREAM))
+		{
+			static int count = 0;
+			string s = string(this->_dir) + "/";
+			s += this->_logName;
+			if (this->_ofs.is_open())
+			{
+				this->_ofs.close();
+			}
+
+			this->_ofs.open(s.c_str(), std::ios::out | std::ios::app);
+			if (!this->_ofs.is_open())
+			{
+				return;
+			}
+			logRecord.print(this->_ofs);
+
+			if (++count % 2 == 0)
+			{
+				this->_ofs.flush();
+				count = 0;
+			}
+		}
+	}
 }

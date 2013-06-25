@@ -10,10 +10,10 @@ namespace les
 		this->_method = method;
 		if (_enabled)
 		{
-			if (LES_LOG_MSG->traceEnbled() && !LES_LOG_MSG->traceActive())
+			if (LES_LOG_MSG->traceEnabled() && !LES_LOG_MSG->traceActive())
 				{
 					LES_LOG_MSG->traceActive(true);
-					//...
+					LES_DEBUG("calling " << this->_method << endl)
 					LES_LOG_MSG->traceActive(false);
 				}		
 		}
@@ -28,10 +28,10 @@ namespace les
 	{
 		if (_enabled)
 		{
-			if (LES_LOG_MSG->traceEnbled() && !LES_LOG_MSG->traceActive())
+			if (LES_LOG_MSG->traceEnabled() && !LES_LOG_MSG->traceActive())
 			{
 				LES_LOG_MSG->traceActive(true);
-				//...
+				LES_DEBUG("leaving " << this->_method << endl)
 				LES_LOG_MSG->traceActive(false);
 			}		
 		}
