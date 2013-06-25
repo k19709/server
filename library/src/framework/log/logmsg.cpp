@@ -146,14 +146,24 @@ namespace les
 		if (LES_BIT_ENABLED(CLogMsg::_flags, OFSTREAM))
 		{
 			static int count = 0;
-			string s = string(this->_dir) + "/";
-			s += this->_logName;
+			string path;
+			if (NULL != this->_dir)
+			{
+				path = string(this->_dir) + "/";
+			}
+
+			if (NULL != this->_logName)
+			{
+				this->_logName = "unknown.log";
+			}
+			path += this->_logName;
+
 			if (this->_ofs.is_open())
 			{
 				this->_ofs.close();
 			}
 
-			this->_ofs.open(s.c_str(), std::ios::out | std::ios::app);
+			this->_ofs.open(path.c_str(), std::ios::out | std::ios::app);
 			if (!this->_ofs.is_open())
 			{
 				return;
