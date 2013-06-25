@@ -26,6 +26,25 @@ namespace les
 #endif
 #endif
 
+#if !defined(NEED_LOG)
+#if !defined(LES_ERROR)
+#define LES_ERROR(X) \
+	do \
+	{ \
+}while (0);
+#endif
+#else
+#if !defined(LES_ERROR)
+#define LES_ERROR(X) \
+	do \
+	{\
+	CLogMsg* ____ = CLogMsg::instance();\
+	____->getStr() << X;\
+	____->log();\
+} while (0);
+#endif
+#endif
+
 #define LES_LOG_MSG CLogMsg::instance()
 
 	class CLogMsg

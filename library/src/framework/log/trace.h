@@ -14,7 +14,6 @@ namespace les
 	public:
 		CTrace(const char* method, int line = 0, const char* file = 0);
 		~CTrace(void);
-		void flush(void);
 
 	public:
 		static void startTrace(void);

@@ -52,7 +52,12 @@ namespace les
 		ostringstream str;
 		str << "[ " << this->_pid << " ] " << "[ " << this->_threadId << " ] ";
 		f.write(str.str().c_str(), strlen(str.str().c_str()));
+		
 		f.write(this->_data, this->_dataSize);
+
+		str.str("");
+		str << endl;
+		f.write(str.str().c_str(), strlen(str.str().c_str()));
 	}
 
 	void CLogRecord::print(FILE* fp)
@@ -60,6 +65,11 @@ namespace les
 		ostringstream str;
 		str << "[ " << this->_pid << " ] " << "[ " << this->_threadId << " ] ";
 		fputs(str.str().c_str(), fp);
+		
 		fputs(this->_data, fp);
+
+		str.str("");
+		str << endl;
+		fputs(str.str().c_str(), fp);
 	}
 }

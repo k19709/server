@@ -2,36 +2,31 @@
 
 namespace les
 {
-	int CTrace::_enabled = DEFAULT_TRACE;
-	int CTrace::_indent = DEFAULT_INDENT;
+	int CTrace::_enabled = CTrace::DEFAULT_TRACE;
+	int CTrace::_indent = CTrace::DEFAULT_INDENT;
 
-	CTrace::CTrace(const char* method, int line /* = 0 */, const char* file /* = 0 */) : _method(0)
+	CTrace::CTrace(const char* method, int line /* = 0 */, const char* file /* = 0 */) : _method(NULL)
 	{
 		this->_method = method;
 		if (_enabled)
 		{
 			if (LES_LOG_MSG->traceEnabled() && !LES_LOG_MSG->traceActive())
-				{
-					LES_LOG_MSG->traceActive(true);
-					LES_DEBUG("calling " << this->_method << endl)
-					LES_LOG_MSG->traceActive(false);
-				}		
+			{
+				LES_LOG_MSG->traceActive(true);
+				LES_DEBUG("calling " << this->_method)
+				LES_LOG_MSG->traceActive(false);
+			}		
 		}
 	}
 
 	CTrace::~CTrace(void)
-	{
-		this->flush();
-	}
-
-	void CTrace::flush(void)
 	{
 		if (_enabled)
 		{
 			if (LES_LOG_MSG->traceEnabled() && !LES_LOG_MSG->traceActive())
 			{
 				LES_LOG_MSG->traceActive(true);
-				LES_DEBUG("leaving " << this->_method << endl)
+				LES_DEBUG("leaving " << this->_method)
 				LES_LOG_MSG->traceActive(false);
 			}		
 		}
