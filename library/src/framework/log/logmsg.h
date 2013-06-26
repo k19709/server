@@ -7,7 +7,15 @@
 
 namespace les
 {
-#if !defined(NEED_LOG)
+#define LES_DEBUG_IMPL(X) \
+	do \
+	{\
+	CLogMsg* ____ = CLogMsg::instance();\
+	____->getStr() << X;\
+	____->log();\
+} while (0);
+
+#if (1 == LES_NLOGGING)
 #if !defined(LES_DEBUG)
 #define LES_DEBUG(X) \
 	do \
@@ -16,34 +24,17 @@ namespace les
 #endif
 #else
 #if !defined(LES_DEBUG)
+#if (1 == LES_NDEBUG)
 #define LES_DEBUG(X) \
 	do \
-	{\
-	CLogMsg* ____ = CLogMsg::instance();\
-	____->getStr() << X;\
-	____->log();\
-	} while (0);
+	{ \
+	}while (0);
+#else
+#define LES_DEBUG(X) LES_DEBUG_IMPL(X)
+#endif
 #endif
 #endif
 
-#if !defined(NEED_LOG)
-#if !defined(LES_ERROR)
-#define LES_ERROR(X) \
-	do \
-	{ \
-}while (0);
-#endif
-#else
-#if !defined(LES_ERROR)
-#define LES_ERROR(X) \
-	do \
-	{\
-	CLogMsg* ____ = CLogMsg::instance();\
-	____->getStr() << X;\
-	____->log();\
-} while (0);
-#endif
-#endif
 
 #define LES_LOG_MSG CLogMsg::instance()
 
@@ -59,8 +50,8 @@ namespace les
 
 		static CLogMsg* instance(void);
 
-		bool traceEnabled(void) const;
-		void traceEnabled(bool enabled);
+		bool tracingEnabled(void) const;
+		void tracingEnabled(bool enabled);
 
 		bool traceActive(void) const;
 		void traceActive(bool active);

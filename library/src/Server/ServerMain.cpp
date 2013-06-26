@@ -25,6 +25,10 @@ void foo (void)
 
 void arg_test(char* i, ...)
 {
+#if defined(LES_NLOGGING)
+
+	cout << "dddddddddddddddddddd" << endl;
+#endif
 	char* j=0;
 	va_list arg_ptr;
 	va_start(arg_ptr, i);
@@ -78,7 +82,8 @@ int main(int argc, char *argv[])
 	CLogMsg::instance()->makeDir("Server_log");
 	CLogMsg::instance()->setLogName("fanren222.log");
 
-	
+	int i = 10;
+	ACE_UNUSED_ARG(i);
 	
 	foo();
 	//ACE_LOG_MSG->open(0, ACE_Log_Msg::OSTREAM | ACE_Log_Msg::STDERR);

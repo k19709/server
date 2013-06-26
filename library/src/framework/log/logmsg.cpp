@@ -28,12 +28,12 @@ namespace les
 		return &ins;
 	}
 
-	bool CLogMsg::traceEnabled(void) const
+	bool CLogMsg::tracingEnabled(void) const
 	{
 		return this->_traceEnabled;
 	}
 
-	void CLogMsg::traceEnabled(bool enabled)
+	void CLogMsg::tracingEnabled(bool enabled)
 	{
 		this->_traceEnabled = enabled;
 	}

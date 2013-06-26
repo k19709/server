@@ -15,6 +15,9 @@
 
 #define AF_ANY  -1
 #define HAS_IPV6
-#define NEED_LOG
+
+#define LES_NLOGGING 0
+#define LES_NDEBUG 0
+#define LES_NTRACE 0
 
 #endif

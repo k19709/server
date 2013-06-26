@@ -2,58 +2,59 @@
 
 namespace les
 {
-	int CTrace::_enabled = CTrace::DEFAULT_TRACE;
-	int CTrace::_indent = CTrace::DEFAULT_INDENT;
+	int CTrace::_enableTracing = CTrace::DEFAULT_TRACE;
+	int CTrace::_nestingIndent = CTrace::DEFAULT_INDENT;
 
-	CTrace::CTrace(const char* method, int line /* = 0 */, const char* file /* = 0 */) : _method(NULL)
-	{
-		this->_method = method;
-		if (_enabled)
+	CTrace::CTrace(const char* method, int line /* = 0 */, const char* file /* = NULL */) : _method(method)
+	{		
+		if (CTrace::isTracing())
 		{
-			if (LES_LOG_MSG->traceEnabled() && !LES_LOG_MSG->traceActive())
+			CLogMsg *lm = CLogMsg::instance();
+			if (lm->tracingEnabled() && !lm->traceActive())
 			{
-				LES_LOG_MSG->traceActive(true);
-				LES_DEBUG("calling " << this->_method)
-				LES_LOG_MSG->traceActive(false);
-			}		
+				lm->traceActive(true);
+				LES_DEBUG("calling " << this->_method << " in file " << file << " on line " << line)
+				lm->traceActive(false);
+			}
 		}
 	}
 
 	CTrace::~CTrace(void)
 	{
-		if (_enabled)
+		if (CTrace::isTracing())
 		{
-			if (LES_LOG_MSG->traceEnabled() && !LES_LOG_MSG->traceActive())
+			CLogMsg *lm = CLogMsg::instance();
+			if (lm->tracingEnabled() && !lm->traceActive())
 			{
-				LES_LOG_MSG->traceActive(true);
+				lm->traceActive(true);
 				LES_DEBUG("leaving " << this->_method)
-				LES_LOG_MSG->traceActive(false);
+				lm->traceActive(false);
 			}		
 		}
 	}
 
-	void CTrace::startTrace(void)
+	bool CTrace::isTracing(void)
 	{
-		CTrace::_enabled = 1;
+		return CTrace::_enableTracing == 1 ? true : false;
 	}
 
-	void CTrace::stopTrace(void)
+	void CTrace::startTracing(void)
 	{
-		CTrace::_enabled = 0;
+		CTrace::_enableTracing = 1;
 	}
 
-	bool CTrace::traceEnabled(void)
+	void CTrace::stopTracing(void)
 	{
-		return CTrace::_enabled == 1 ? true : false;
+		CTrace::_enableTracing = 0;
 	}
 
-	int CTrace::getIndent(void)
+	int CTrace::getNestingIndent(void)
 	{
-		return CTrace::_indent;
+		return CTrace::_nestingIndent;
 	}
 
-	void CTrace::setIndent(int indent)
+	void CTrace::setNestingIndent(int indent)
 	{
-		CTrace::_indent = indent;
+		CTrace::_nestingIndent = indent;
 	}
 }

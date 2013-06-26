@@ -1,32 +1,38 @@
 #ifndef _LES_TRACE_H_
 #define _LES_TRACE_H_
-#include "common.h"
 #include "log/logmsg.h"
 
 namespace les
 {
+#define LES_TRACE_IMPL(X) CTrace ____(X, __LINE__, __FILE__);
+
 #if !defined(LES_TRACE)
-#define LES_TRACE(X) CTrace ____(X, __LINE__, __FILE__);
+#if (1 == LES_NTRACE)
+#define LES_TRACE(X)
+#else
+#define LES_TRACE(X) LES_TRACE_IMPL(X)
+#endif
 #endif
 
 	class CTrace
 	{
 	public:
-		CTrace(const char* method, int line = 0, const char* file = 0);
+		CTrace(const char* method, int line = 0, const char* file = NULL);
 		~CTrace(void);
 
 	public:
-		static void startTrace(void);
-		static void stopTrace(void);
-		static bool traceEnabled(void);
+		static bool isTracing(void);
+		static void startTracing(void);
+		static void stopTracing(void);
 
-		static int getIndent(void);
-		static void setIndent(int indent);
+		static int getNestingIndent(void);
+		static void setNestingIndent(int indent);
 
 	private:
 		const char* _method;
-		static int _enabled;
-		static int _indent;
+		
+		static int _enableTracing;
+		static int _nestingIndent;
 
 		enum
 		{
