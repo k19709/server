@@ -13,7 +13,7 @@ namespace les
 		~CLogRecord(void);
 
 		void setData(const char* data);
-		void print(ofstream &f);
+		void print(ostream &os);
 		void print(FILE* fp);
 
 	private:

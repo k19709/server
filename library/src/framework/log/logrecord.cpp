@@ -47,17 +47,10 @@ namespace les
 		strncpy(this->_data, data, this->_dataSize);
 	}
 	
-	void CLogRecord::print(ofstream &f)
+	void CLogRecord::print(ostream &os)
 	{
-		ostringstream str;
-		str << "[ " << this->_pid << " ] " << "[ " << this->_threadId << " ] ";
-		f.write(str.str().c_str(), strlen(str.str().c_str()));
-		
-		f.write(this->_data, this->_dataSize);
-
-		str.str("");
-		str << endl;
-		f.write(str.str().c_str(), strlen(str.str().c_str()));
+		os << "[ " << this->_pid << " ] " << "[ " << this->_threadId << " ] " << this->_data << endl;
+		os.flush();
 	}
 
 	void CLogRecord::print(FILE* fp)

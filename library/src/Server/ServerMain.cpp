@@ -23,62 +23,14 @@ void foo (void)
 	LES_TRACE("foo")
 }
 
-void arg_test(char* i, ...)
-{
-#if defined(LES_NLOGGING)
-
-	cout << "dddddddddddddddddddd" << endl;
-#endif
-	char* j=0;
-	va_list arg_ptr;
-	va_start(arg_ptr, i);
-
-	j = va_arg(arg_ptr, char*);
-	j = va_arg(arg_ptr, char*);
-
-	//va_arg(arg_ptr, char*);
-	//j = *(char*)arg_ptr;
-
-	//va_arg(arg_ptr, char*);
-	//j = *(char*)arg_ptr;
-
-	//va_arg(arg_ptr, char*);
-	//j = *(char*)arg_ptr;
-}
-
-class CA
-{
-public:
-	CA() : _ms(0)
-	{
-
-	}
-	~CA()
-	{
-	}
-
-	void set(const char* m)
-	{
-		_ms = m;
-	}
-
-	const char* get() const
-	{
-		return _ms;
-	}
-protected:
-private:
-	const char* _ms;
-};
-
 int main(int argc, char *argv[])   
 {
-	arg_test("nihao", "zcz");
+
 	ACE::init();
 	WSADATA wsa; 
 	WSAStartup(MAKEWORD(2,2),&wsa);
 
-	CLogMsg::instance()->open(NULL, les::CLogMsg::STDOUT | les::CLogMsg::OFSTREAM);
+	CLogMsg::instance()->open(NULL, les::CLogMsg::STDERR | les::CLogMsg::OSTREAM);
 	CLogMsg::instance()->makeDir("Server_log");
 	CLogMsg::instance()->setLogName("fanren222.log");
 

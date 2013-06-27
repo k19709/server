@@ -35,17 +35,14 @@ namespace les
 #endif
 #endif
 
-
-#define LES_LOG_MSG CLogMsg::instance()
-
 	class CLogMsg
 	{
 	public:
 		// log flags
 		enum
 		{
-			STDOUT		= 1,	//write msg to stdout
-			OFSTREAM	= 2,	//write msg to ofstream
+			STDERR	= 1,	//write msg to stderr
+			OSTREAM	= 2,	//write msg to ofstream
 		};
 
 		static CLogMsg* instance(void);
@@ -71,7 +68,7 @@ namespace les
 		u_int getPID(void);
 		u_int getThreadId(void);
 
-		void open(const char* progName, u_long flags);
+		void open(u_long flags);
 		void log(void);
 		void log(const char* msg);
 		void log(CLogRecord& logRecord);
@@ -88,9 +85,8 @@ namespace les
 		const char* _logName;
 		
 		ostringstream _ostr;
-		ofstream _ofs;
+		ostream _os;
 
-		static const char* _progName;
 		static u_long _flags;
 	};
 }

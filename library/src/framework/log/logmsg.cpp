@@ -4,7 +4,6 @@
 
 namespace les
 {
-	const char* CLogMsg::_progName = NULL;
 	u_long CLogMsg::_flags = 0;
 
 	CLogMsg::CLogMsg(void) :
@@ -13,9 +12,9 @@ namespace les
 		_dir(NULL),
 		_logName(NULL),
 		_ostr(),
-		_ofs()
+		_os()
 	{
-		_ofs.flush();
+		_os.flush();
 	}
 
 	CLogMsg::~CLogMsg(void)
@@ -24,8 +23,8 @@ namespace les
 
 	CLogMsg* CLogMsg::instance(void)
 	{
-		static CLogMsg ins;
-		return &ins;
+		static CLogMsg instance;
+		return &instance;
 	}
 
 	bool CLogMsg::tracingEnabled(void) const
@@ -100,25 +99,16 @@ namespace les
 		return ::GetCurrentThreadId();
 	}
 
-	void CLogMsg::open(const char* progName, u_long flags)
+	void CLogMsg::open(u_long flags)
 	{
-		if (NULL != progName)
+		if (LES_BIT_ENABLED(flags, STDERR))
 		{
-			CLogMsg::_progName = progName;
-		}
-		else if (NULL == progName)
-		{
-			CLogMsg::_progName = "<unknown>";
+			LES_SET_BITS(CLogMsg::_flags, STDERR);
 		}
 
-		if (LES_BIT_ENABLED(flags, STDOUT))
+		if (LES_BIT_ENABLED(flags, OSTREAM))
 		{
-			LES_SET_BITS(CLogMsg::_flags, STDOUT);
-		}
-
-		if (LES_BIT_ENABLED(flags, OFSTREAM))
-		{
-			LES_SET_BITS(CLogMsg::_flags, OFSTREAM);
+			LES_SET_BITS(CLogMsg::_flags, OSTREAM);
 		}
 	}
 
@@ -138,43 +128,36 @@ namespace les
 
 	void CLogMsg::log(CLogRecord& logRecord)
 	{
-		if (LES_BIT_ENABLED(CLogMsg::_flags, STDOUT))
+		if (LES_BIT_ENABLED(CLogMsg::_flags, STDERR))
 		{
 			logRecord.print(stdout);
 		}
 
-		if (LES_BIT_ENABLED(CLogMsg::_flags, OFSTREAM))
+		if (LES_BIT_ENABLED(CLogMsg::_flags, OSTREAM))
 		{
-			static int count = 0;
 			string path;
 			if (NULL != this->_dir)
 			{
 				path = string(this->_dir) + "/";
 			}
 
-			if (NULL != this->_logName)
+			if (NULL == this->_logName)
 			{
 				this->_logName = "unknown.log";
 			}
 			path += this->_logName;
 
-			if (this->_ofs.is_open())
+			if (this->_os.is_open())
 			{
-				this->_ofs.close();
+				this->_os.close();
 			}
 
-			this->_ofs.open(path.c_str(), std::ios::out | std::ios::app);
-			if (!this->_ofs.is_open())
+			this->_os.open(path.c_str(), std::ios::out | std::ios::app);
+			if (!this->_os.is_open())
 			{
 				return;
 			}
-			logRecord.print(this->_ofs);
-
-			if (++count % 2 == 0)
-			{
-				this->_ofs.flush();
-				count = 0;
-			}
+			logRecord.print(this->_os);
 		}
 	}
 }

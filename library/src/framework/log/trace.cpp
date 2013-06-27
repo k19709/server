@@ -29,7 +29,7 @@ namespace les
 				lm->traceActive(true);
 				LES_DEBUG("leaving " << this->_method)
 				lm->traceActive(false);
-			}		
+			}	
 		}
 	}
 
