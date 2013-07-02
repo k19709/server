@@ -43,12 +43,14 @@ namespace les
 		{
 			STDERR	= 1,	//write msg to stderr
 			OSTREAM	= 2,	//write msg to ofstream
+			SILENT = 4,		//do not print messages at all
 		};
 
 		static CLogMsg* instance(void);
 
 		bool tracingEnabled(void) const;
-		void tracingEnabled(bool enabled);
+		void startTracing(void);
+		void stopTracing(void);
 
 		bool traceActive(void) const;
 		void traceActive(bool active);
@@ -65,12 +67,10 @@ namespace les
 		void clrFlags(u_long f);
 		void setFlags(u_long f);
 
-		u_int getPID(void);
-		u_int getThreadId(void);
+		pid_t getPID(void);
 
 		void open(u_long flags);
-		void log(void);
-		void log(const char* msg);
+		void log(const char* msg = NULL);
 		void log(CLogRecord& logRecord);
 
 	private:
@@ -78,16 +78,18 @@ namespace les
 		~CLogMsg(void);
 
 	private:
-		bool _traceEnabled;
-		bool _traceActive;
-		
-		const char* _dir;
-		const char* _logName;
-		
 		ostringstream _ostr;
 		ostream _os;
+		
+		int _traceDepth;
+		bool _traceActive;
+		bool _tracingEnabled;
+
+		const char* _dir;
+		const char* _logName;
 
 		static u_long _flags;
+		static pid_t _pid;
 	};
 }
 

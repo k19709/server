@@ -7,18 +7,16 @@ namespace les
 		_dataSize(0),
 		_dataMaxSize(0),
 		_pid(0),
-		_threadId(0)
 	{
 		this->_dataMaxSize = MAXLOGMSGLEN;
 		this->_data = new char[this->_dataMaxSize];
 	}
 
-	CLogRecord::CLogRecord(u_int pid, u_int threadId) : 
+	CLogRecord::CLogRecord(pid_t pid) : 
 		_data(NULL),
 		_dataSize(0),
 		_dataMaxSize(0),
 		_pid(pid),
-		_threadId(threadId)
 	{
 		this->_dataMaxSize = MAXLOGMSGLEN;
 		this->_data = new char[this->_dataMaxSize];
@@ -32,7 +30,7 @@ namespace les
 		}
 	}
 
-	void CLogRecord::setData(const char* data)
+	void CLogRecord::msgData(const char* data)
 	{
 		size_t newSize = ::strlen(data);
 		if (newSize > this->_dataMaxSize)
@@ -49,14 +47,14 @@ namespace les
 	
 	void CLogRecord::print(ostream &os)
 	{
-		os << "[ " << this->_pid << " ] " << "[ " << this->_threadId << " ] " << this->_data << endl;
+		os << "[ " << this->_pid << " ] " << this->_data << endl;
 		os.flush();
 	}
 
 	void CLogRecord::print(FILE* fp)
 	{
 		ostringstream str;
-		str << "[ " << this->_pid << " ] " << "[ " << this->_threadId << " ] ";
+		str << "[ " << this->_pid << " ] ";
 		fputs(str.str().c_str(), fp);
 		
 		fputs(this->_data, fp);

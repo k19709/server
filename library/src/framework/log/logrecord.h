@@ -9,10 +9,10 @@ namespace les
 	{
 	public:
 		CLogRecord(void);
-		CLogRecord(u_int pid, u_int threadId);
+		CLogRecord(pid_t pid);
 		~CLogRecord(void);
 
-		void setData(const char* data);
+		void msgData(const char* data);
 		void print(ostream &os);
 		void print(FILE* fp);
 
@@ -25,8 +25,7 @@ namespace les
 		size_t _dataSize;
 		size_t _dataMaxSize;
 
-		u_int _pid;
-		u_int _threadId;
+		pid_t _pid;
 	};
 }
 
