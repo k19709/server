@@ -9,24 +9,49 @@ namespace les
 
 	CLogMsg::CLogMsg(void) :
 		_ostr(),
-		_os(),
+		_ofstream(NULL),
 		_traceDepth(0),
 		_traceActive(false),
 		_tracingEnabled(true),
 		_dir(NULL),
-		_logName(NULL)
+		_file(NULL)
 	{
+		this->_ofstream = new ofstream();
 	}
 
 	CLogMsg::~CLogMsg(void)
 	{
-		_os.flush();
+		if (NULL != this->_ofstream)
+		{
+			this->_ofstream->flush();
+			delete this->_ofstream;
+			this->_ofstream = NULL;
+		}
 	}
 
-	CLogMsg* CLogMsg::instance(void)
+	ostringstream& CLogMsg::ostr(void)
 	{
-		static CLogMsg instance;
-		return &instance;
+		return this->_ostr;
+	}
+
+	void CLogMsg::incDepth(void)
+	{
+		this->_traceDepth++; 
+	}
+
+	void CLogMsg::decDepth(void)
+	{
+		0 >= this->_traceDepth ? 0 : --this->_traceDepth;
+	}
+
+	int CLogMsg::getTraceDepth(void)
+	{
+		return this->_traceDepth;
+	}
+
+	void CLogMsg::setTraceDepth(int depth)
+	{
+		this->_traceDepth = depth;
 	}
 
 	bool CLogMsg::tracingEnabled(void) const
@@ -59,31 +84,20 @@ namespace les
 		return this->_dir;
 	}
 
-	void CLogMsg::makeDir(const char* dir)
+	void CLogMsg::setDir(const char* dir)
 	{
 		mkdir(dir);
 		this->_dir = dir;
 	}
 
-	const char* CLogMsg::getLogName(void) const
+	const char* CLogMsg::getFile(void) const
 	{
-		return this->_logName;
+		return this->_file;
 	}
 
-	void CLogMsg::setLogName(const char* name)
+	void CLogMsg::setFile(const char* s)
 	{
-		this->_logName = name;
-	}
-
-	ostringstream& CLogMsg::getStr(void)
-	{
-		return this->_ostr;
-	}
-
-	void CLogMsg::setStr(const char* str)
-	{
-		this->_ostr.str("");
-		this->_ostr << str;
+		this->_file = s;
 	}
 
 	void CLogMsg::clrFlags(u_long f)
@@ -112,10 +126,13 @@ namespace les
 			LES_CLR_BITS(CLogMsg::_flags, CLogMsg::STDERR);
 		}
 
-		if (LES_BIT_ENABLED(flags, CLogMsg::OSTREAM))
+		if (LES_BIT_ENABLED(flags, CLogMsg::OFSTREAM))
 		{
-			LES_SET_BITS(CLogMsg::_flags, CLogMsg::OSTREAM);
-			this->_os = cerr;
+			LES_SET_BITS(CLogMsg::_flags, CLogMsg::OFSTREAM);
+			if (NULL == this->_ofstream)
+			{
+				this->_ofstream = new ofstream();
+			}
 		}
 
 		if (LES_BIT_ENABLED(flags, CLogMsg::SILENT))
@@ -128,11 +145,11 @@ namespace les
 	{
 		if (NULL != msg)
 		{
-			this->setStr(msg);
+			this->_ostr.str(msg);
 		}
 
 		CLogRecord logRecord(this->getPID());
-		logRecord.msgData(this->_ostr.str().c_str());
+		logRecord.setMsgData(this->_ostr.str().c_str());
 		this->_ostr.str("");
 		this->log(logRecord);
 	}
@@ -143,36 +160,41 @@ namespace les
 		{
 			bool tracing = this->tracingEnabled();
 			this->stopTracing();
+			
 			if (LES_BIT_ENABLED(CLogMsg::_flags, STDERR))
 			{
-				logRecord.print(stdout);
+				logRecord.print(stderr);
 			}
 
-			if (LES_BIT_ENABLED(CLogMsg::_flags, OSTREAM))
+			if (LES_BIT_ENABLED(CLogMsg::_flags, OFSTREAM))
 			{
-				string path;
-				if (NULL != this->_dir)
+				if (NULL != this->_ofstream)
 				{
-					path = string(this->_dir) + "/";
-				}
+					string path;
+					if (NULL != this->_dir)
+					{
+						path = string(this->_dir) + "/";
+					}
 
-				if (NULL == this->_logName)
-				{
-					this->_logName = "unknown.log";
-				}
-				path += this->_logName;
+					if (NULL == this->_file)
+					{
+						this->_file = "unkown.log";
+					}
+					path += this->_file;
 
-				if (this->_os.is_open())
-				{
-					this->_os.close();
-				}
+					if (this->_ofstream->is_open())
+					{
+						this->_ofstream->close();
+					}
 
-				this->_os.open(path.c_str(), std::ios::out | std::ios::app);
-				if (!this->_os.is_open())
-				{
-					return;
+					this->_ofstream->open(path.c_str(), std::ios::out | std::ios::app);
+					if (!this->_ofstream->is_open())
+					{
+						return;
+					}
+					
+					logRecord.print(*this->_ofstream);
 				}
-				logRecord.print(this->_os);
 			}
 
 			if (tracing)
@@ -180,5 +202,11 @@ namespace les
 				this->startTracing();
 			}
 		}
+	}
+
+	CLogMsg* CLogMsg::instance(void)
+	{
+		static CLogMsg instance;
+		return &instance;
 	}
 }

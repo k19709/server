@@ -1,8 +1,6 @@
 #ifndef _LES_SOCKET_H_
 #define _LES_SOCKET_H_
 
-#include "common.h"
-#include "link.h"
 #include "socket/addr.h"
 
 namespace les

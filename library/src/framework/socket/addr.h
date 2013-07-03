@@ -1,6 +1,8 @@
 #ifndef	_LES_ADDR_H_
 #define _LES_ADDR_H_
 
+#include "common.h"
+
 namespace les
 {
 	class CAddr

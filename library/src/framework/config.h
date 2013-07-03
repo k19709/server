@@ -17,7 +17,7 @@
 #define LES_NTRACE 0
 
 #if !defined(MAXLOGMSGLEN)
-#define MAXLOGMSGLEN 4*1024
+#define MAXLOGMSGLEN (4*1024)
 #endif
 
 

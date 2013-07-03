@@ -1,11 +1,11 @@
 #include "socket/addr.h"
-#include "config.h"
 
 namespace les
 {
 	CAddr::CAddr(void) : 
 		_type(AF_ANY), _size(-1)
 	{
+		
 	}
 
 	CAddr::CAddr(int type, int size) : 

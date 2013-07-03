@@ -1,7 +1,9 @@
 #ifndef _LES_LOG_RECORD_H_
 #define _LES_LOG_RECORD_H_
+
+#include <sstream>
+#include <fstream>
 #include "common.h"
-#include "config.h"
 
 namespace les
 {
@@ -12,7 +14,9 @@ namespace les
 		CLogRecord(pid_t pid);
 		~CLogRecord(void);
 
-		void msgData(const char* data);
+		const char* getMsgData(void) const;
+		void setMsgData(const char* data);
+
 		void print(ostream &os);
 		void print(FILE* fp);
 
@@ -21,9 +25,9 @@ namespace les
 		CLogRecord& operator= (const CLogRecord&);
 
 	private:
-		char* _data;
-		size_t _dataSize;
-		size_t _dataMaxSize;
+		char* _msgData;
+		size_t _length;
+		size_t _msgDataSize;
 
 		pid_t _pid;
 	};

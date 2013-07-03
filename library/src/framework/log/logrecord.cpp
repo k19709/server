@@ -3,64 +3,71 @@
 namespace les
 {
 	CLogRecord::CLogRecord(void) : 
-		_data(NULL),
-		_dataSize(0),
-		_dataMaxSize(0),
-		_pid(0),
+		_msgData(NULL),
+		_length(0),
+		_msgDataSize(0),
+		_pid(0)
 	{
-		this->_dataMaxSize = MAXLOGMSGLEN;
-		this->_data = new char[this->_dataMaxSize];
+		this->_msgDataSize = MAXLOGMSGLEN;
+		this->_msgData = new char[this->_msgDataSize];
+		if (NULL != this->_msgData)
+		{
+			this->_msgData[0] = '\0';
+		}
 	}
 
 	CLogRecord::CLogRecord(pid_t pid) : 
-		_data(NULL),
-		_dataSize(0),
-		_dataMaxSize(0),
-		_pid(pid),
+		_msgData(NULL),
+		_length(0),
+		_msgDataSize(0),
+		_pid(pid)
 	{
-		this->_dataMaxSize = MAXLOGMSGLEN;
-		this->_data = new char[this->_dataMaxSize];
+		this->_msgDataSize = MAXLOGMSGLEN;
+		this->_msgData = new char[this->_msgDataSize];
+		if (NULL == this->_msgData)
+		{
+			this->_msgData[0] = '\0';
+		}
 	}
 
 	CLogRecord::~CLogRecord(void)
 	{
-		if (NULL != this->_data)
+		if (NULL != this->_msgData)
 		{
-			delete[] this->_data;
+			delete[] this->_msgData;
 		}
 	}
 
-	void CLogRecord::msgData(const char* data)
+	void CLogRecord::setMsgData(const char* data)
 	{
-		size_t newSize = ::strlen(data);
-		if (newSize > this->_dataMaxSize)
+		size_t newLen = ::strlen(data);
+		if (newLen > this->_msgDataSize)
 		{
-			char* newData = new char[newSize];
-			delete[] this->_data;
-			this->_data = newData;
-			this->_dataMaxSize = newSize;
+			char* newMsgData = new char[newLen];
+			delete[] this->_msgData;
+			this->_msgData = newMsgData;
+			this->_msgDataSize = newLen;
 		}
-		this->_dataSize = newSize;
-		memset(this->_data, 0, this->_dataMaxSize);
-		strncpy(this->_data, data, this->_dataSize);
+		this->_length = newLen;
+		memset(this->_msgData, 0, this->_msgDataSize);
+		strncpy(this->_msgData, data, this->_length);
+	}
+
+	const char* CLogRecord::getMsgData(void) const
+	{
+		return this->_msgData;
 	}
 	
 	void CLogRecord::print(ostream &os)
 	{
-		os << "[ " << this->_pid << " ] " << this->_data << endl;
+		os << "[ " << this->_pid << " ]   " << this->_msgData << endl;
 		os.flush();
 	}
 
 	void CLogRecord::print(FILE* fp)
 	{
 		ostringstream str;
-		str << "[ " << this->_pid << " ] ";
-		fputs(str.str().c_str(), fp);
-		
-		fputs(this->_data, fp);
-
-		str.str("");
-		str << endl;
+		str << "[ " << this->_pid << " ]   " << this->_msgData << endl;
 		fputs(str.str().c_str(), fp);
 	}
 }

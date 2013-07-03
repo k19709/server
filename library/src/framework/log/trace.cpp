@@ -13,7 +13,7 @@ namespace les
 			if (lm->tracingEnabled() && !lm->traceActive())
 			{
 				lm->traceActive(true);
-				LES_DEBUG("calling " << this->_method << " in file " << file << " on line " << line)
+				LES_DEBUG("calling " << this->_method /*<< " in file " << file << " on line " << line*/)
 				lm->traceActive(false);
 			}
 		}

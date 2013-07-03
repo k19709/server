@@ -1,8 +1,6 @@
 #ifndef _LES_LOG_MSG_H_
 #define _LES_LOG_MSG_H_
 
-#include "config.h"
-#include "common.h"
 #include "log/logrecord.h"
 
 namespace les
@@ -11,7 +9,7 @@ namespace les
 	do \
 	{\
 	CLogMsg* ____ = CLogMsg::instance();\
-	____->getStr() << X;\
+	____->ostr() << X;\
 	____->log();\
 } while (0);
 
@@ -41,12 +39,17 @@ namespace les
 		// log flags
 		enum
 		{
-			STDERR	= 1,	//write msg to stderr
-			OSTREAM	= 2,	//write msg to ofstream
-			SILENT = 4,		//do not print messages at all
+			STDERR		= 1,	//write msg to stderr
+			OFSTREAM	= 2,	//write msg to ofstream
+			SILENT		= 4,	//do not print messages at all
 		};
 
-		static CLogMsg* instance(void);
+		ostringstream& ostr(void);
+		
+		void incDepth(void);
+		void decDepth(void);
+		int getTraceDepth(void);
+		void setTraceDepth(int depth);
 
 		bool tracingEnabled(void) const;
 		void startTracing(void);
@@ -56,13 +59,10 @@ namespace les
 		void traceActive(bool active);
 		
 		const char* getDir(void) const;
-		void makeDir(const char* dir);
+		void setDir(const char* dir);
 
-		const char* getLogName(void) const;
-		void setLogName(const char* name);
-
-		ostringstream& getStr(void);
-		void setStr(const char* str);
+		const char* getFile(void) const;
+		void setFile(const char* s);
 
 		void clrFlags(u_long f);
 		void setFlags(u_long f);
@@ -73,20 +73,22 @@ namespace les
 		void log(const char* msg = NULL);
 		void log(CLogRecord& logRecord);
 
+		static CLogMsg* instance(void);
+
 	private:
 		CLogMsg(void);
 		~CLogMsg(void);
 
 	private:
 		ostringstream _ostr;
-		ostream _os;
+		ofstream* _ofstream;
 		
 		int _traceDepth;
 		bool _traceActive;
 		bool _tracingEnabled;
 
 		const char* _dir;
-		const char* _logName;
+		const char* _file;
 
 		static u_long _flags;
 		static pid_t _pid;

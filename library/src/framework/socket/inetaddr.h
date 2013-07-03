@@ -2,8 +2,6 @@
 #define _LES_INET_ADDR_H_
 
 #include "socket/addr.h"
-#include "common.h"
-#include "config.h"
 
 namespace les
 {
