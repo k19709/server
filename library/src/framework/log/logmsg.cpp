@@ -4,7 +4,6 @@
 
 namespace les
 {
-	u_long CLogMsg::_flags = CLogMsg::STDERR;
 	pid_t CLogMsg::_pid = -2;
 
 	CLogMsg::CLogMsg(void) :
@@ -12,9 +11,10 @@ namespace les
 		_ofstream(NULL),
 		_traceDepth(0),
 		_traceActive(false),
-		_tracingEnabled(true),
+		_traceEnabled(true),
 		_dir(NULL),
-		_file(NULL)
+		_file(NULL),
+		_flags(CLogMsg::STDERR)
 	{
 		this->_ofstream = new ofstream();
 	}
@@ -34,12 +34,12 @@ namespace les
 		return this->_ostr;
 	}
 
-	void CLogMsg::incDepth(void)
+	void CLogMsg::incTraceDepth(void)
 	{
 		this->_traceDepth++; 
 	}
 
-	void CLogMsg::decDepth(void)
+	void CLogMsg::decTraceDepth(void)
 	{
 		0 >= this->_traceDepth ? 0 : --this->_traceDepth;
 	}
@@ -54,19 +54,19 @@ namespace les
 		this->_traceDepth = depth;
 	}
 
-	bool CLogMsg::tracingEnabled(void) const
+	bool CLogMsg::traceEnabled(void) const
 	{
-		return this->_tracingEnabled;
+		return this->_traceEnabled;
 	}
 
-	void CLogMsg::startTracing(void)
+	void CLogMsg::startTrace(void)
 	{
-		this->_tracingEnabled = true;
+		this->_traceEnabled = true;
 	}
 
-	void CLogMsg::stopTracing(void)
+	void CLogMsg::stopTrace(void)
 	{
-		this->_tracingEnabled = false;
+		this->_traceEnabled = false;
 	}
 
 	bool CLogMsg::traceActive(void) const
@@ -102,12 +102,12 @@ namespace les
 
 	void CLogMsg::clrFlags(u_long f)
 	{
-		LES_CLR_BITS(CLogMsg::_flags, f);
+		LES_CLR_BITS(this->_flags, f);
 	}
 
 	void CLogMsg::setFlags(u_long f)
 	{
-		LES_SET_BITS(CLogMsg::_flags, f);
+		LES_SET_BITS(this->_flags, f);
 	}
 
 	pid_t CLogMsg::getPID(void)
@@ -123,12 +123,12 @@ namespace les
 	{
 		if (!LES_BIT_ENABLED(flags, CLogMsg::STDERR))
 		{
-			LES_CLR_BITS(CLogMsg::_flags, CLogMsg::STDERR);
+			LES_CLR_BITS(this->_flags, CLogMsg::STDERR);
 		}
 
 		if (LES_BIT_ENABLED(flags, CLogMsg::OFSTREAM))
 		{
-			LES_SET_BITS(CLogMsg::_flags, CLogMsg::OFSTREAM);
+			LES_SET_BITS(this->_flags, CLogMsg::OFSTREAM);
 			if (NULL == this->_ofstream)
 			{
 				this->_ofstream = new ofstream();
@@ -137,7 +137,7 @@ namespace les
 
 		if (LES_BIT_ENABLED(flags, CLogMsg::SILENT))
 		{
-			LES_SET_BITS(CLogMsg::_flags, CLogMsg::SILENT);
+			LES_SET_BITS(this->_flags, CLogMsg::SILENT);
 		}
 	}
 
@@ -156,17 +156,17 @@ namespace les
 
 	void CLogMsg::log(CLogRecord& logRecord)
 	{
-		if (LES_BIT_DISABLED(CLogMsg::_flags, CLogMsg::SILENT))
+		if (LES_BIT_DISABLED(this->_flags, CLogMsg::SILENT))
 		{
-			bool tracing = this->tracingEnabled();
-			this->stopTracing();
+			bool tracing = this->traceEnabled();
+			this->stopTrace();
 			
-			if (LES_BIT_ENABLED(CLogMsg::_flags, STDERR))
+			if (LES_BIT_ENABLED(this->_flags, STDERR))
 			{
 				logRecord.print(stderr);
 			}
 
-			if (LES_BIT_ENABLED(CLogMsg::_flags, OFSTREAM))
+			if (LES_BIT_ENABLED(this->_flags, OFSTREAM))
 			{
 				if (NULL != this->_ofstream)
 				{
@@ -199,7 +199,7 @@ namespace les
 
 			if (tracing)
 			{
-				this->startTracing();
+				this->startTrace();
 			}
 		}
 	}

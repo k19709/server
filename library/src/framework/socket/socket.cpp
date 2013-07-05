@@ -1,4 +1,6 @@
 #include "socket/socket.h"
+#include "log/logmsg.h"
+#include "util/error.h"
 
 namespace les
 {
@@ -8,15 +10,17 @@ namespace les
 
 	CSocket::CSocket(int af, int type, int protocol, int reUseAddr)
 	{
-		if (-1 == this->open(af, type, protocol, reUseAddr))
+		if (0 != this->open(af, type, protocol, reUseAddr))
 		{
+			LES_ERROR("CSocket::CSocket() error: " << getLastError())
 		}
 	}
 
 	CSocket::CSocket(int af, int type, int protocol, LPWSAPROTOCOL_INFO info, GROUP g, DWORD flags, int reUseAddr)
 	{
-		if (-1 == this->open(af, type, protocol, info, g, flags, reUseAddr))
+		if (0 != this->open(af, type, protocol, info, g, flags, reUseAddr))
 		{
+			LES_ERROR("CSocket::CSocket() error: " << getLastError())
 		}
 	}
 
@@ -27,7 +31,7 @@ namespace les
 	int CSocket::setOpt(int level, int optName, void* optVal, int optLen)
 	{
 		// if successful, then return 0, otherwise return -1
-		if (SOCKET_ERROR == setsockopt(this->get(), level, optName, (const char*)optVal, optLen ))
+		if (SOCKET_ERROR == ::setsockopt(this->get(), level, optName, (const char*)optVal, optLen ))
 		{
 			return -1;
 		}
@@ -38,7 +42,7 @@ namespace les
 	int CSocket::getOpt(int level, int optName, void* optVal, int* optLen)
 	{
 		// if successful, then return 0, otherwise return -1
-		if (SOCKET_ERROR == getsockopt(this->get(), level, optName, (char*)optVal, optLen))
+		if (SOCKET_ERROR == ::getsockopt(this->get(), level, optName, (char*)optVal, optLen))
 		{
 			return -1;
 		}
@@ -50,7 +54,7 @@ namespace les
 	{
 		// reuse addr
 		int optVal = 1;
-		this->set(socket(af, type, protocol));
+		this->set(::socket(af, type, protocol));
 		
 		if (INVALID_SOCKET == this->get())
 		{
@@ -73,7 +77,7 @@ namespace les
 	int CSocket::open(int af, int type, int protocol, LPWSAPROTOCOL_INFO info, GROUP g, DWORD flags, int reUseAddr)
 	{
 		int optVal = 1;
-		this->set(WSASocket(af, type, protocol, info, g, flags));
+		this->set(::WSASocket(af, type, protocol, info, g, flags));
 
 		if (INVALID_SOCKET == this->get())
 		{
@@ -98,7 +102,7 @@ namespace les
 		int result = 0;
 		if ( INVALID_SOCKET != get())
 		{
-			result = closesocket(this->get());
+			result = ::closesocket(this->get());
 			this->set(INVALID_SOCKET);
 		}
 
@@ -110,7 +114,7 @@ namespace les
 		struct sockaddr sa;
 		int len = sizeof(sa);
 
-		if (SOCKET_ERROR == getpeername(this->get(), &sa, &len))
+		if (SOCKET_ERROR == ::getpeername(this->get(), &sa, &len))
 		{
 			return -1;
 		}
@@ -125,7 +129,7 @@ namespace les
 		struct sockaddr sa;
 		int len = sizeof(sa);
 
-		if (SOCKET_ERROR == getsockname(this->get(), &sa, &len))
+		if (SOCKET_ERROR == ::getsockname(this->get(), &sa, &len))
 		{
 			return -1;
 		}

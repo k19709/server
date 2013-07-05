@@ -311,6 +311,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="util"
+				>
+				<File
+					RelativePath="..\..\src\framework\util\error.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\framework\util\error.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"

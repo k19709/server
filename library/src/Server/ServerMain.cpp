@@ -15,9 +15,10 @@
 #pragma comment(lib, "framework.lib")
 using namespace les;
 
-void foo (void)
+int foo (void)
 {
 	LES_TRACE("foo")
+	return 0;
 }
 
 int main(int argc, char *argv[])   
@@ -36,7 +37,7 @@ int main(int argc, char *argv[])
 	foo();
 	while (1)
 	{
-		LES_DEBUG("cjdklfkdsjflkdjdsjfjdkfjdkljfakljklfajsdklfjakljkjl")
+		LES_DEBUG("cjdklfkdsjflkdjdsjfjdkfjdkljfakljklfajsdklfjakljkjl" << foo())
 		Sleep(800);
 	}
 

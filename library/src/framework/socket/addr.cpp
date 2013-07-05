@@ -54,13 +54,11 @@ namespace les
 
 	bool CAddr::operator ==(const CAddr& ref) const
 	{
-		return (this->_type == ref.getType()
-				&& this->_size == ref.getSize());
+		return (this->_type == ref.getType() && this->_size == ref.getSize());
 	}
 
 	bool CAddr::operator !=(const CAddr& ref) const
 	{
-		return (this->_type != ref.getType()
-				|| this->_size != ref.getSize());
+		return !(*this == ref);
 	}
 }

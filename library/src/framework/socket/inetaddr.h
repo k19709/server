@@ -31,6 +31,7 @@ namespace les
 		virtual void* getAddr(void) const;
 		
 		int setAddress(const char* ipAddr, int len, bool encode = true, bool map = false);
+
 	private:
 		int getPortFromPortName(const char portName[], const char protocol[]);
 		void reset(void);

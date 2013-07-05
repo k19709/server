@@ -15,20 +15,28 @@ namespace les
 
 #if (1 == LES_NLOGGING)
 #if !defined(LES_DEBUG)
-#define LES_DEBUG(X) \
-	do \
-	{ \
-	}while (0);
+#define LES_DEBUG(X)
 #endif
 #else
 #if !defined(LES_DEBUG)
 #if (1 == LES_NDEBUG)
-#define LES_DEBUG(X) \
-	do \
-	{ \
-	}while (0);
+#define LES_DEBUG(X)
 #else
 #define LES_DEBUG(X) LES_DEBUG_IMPL(X)
+#endif
+#endif
+#endif
+
+#if (1 == LES_NLOGGING)
+#if !defined(LES_ERROR)
+#define LES_ERROR(X)
+#endif
+#else
+#if !defined(LES_ERROR)
+#if (1 == LES_NDEBUG)
+#define LES_ERROR(X)
+#else
+#define LES_ERROR(X) LES_DEBUG_IMPL(X)
 #endif
 #endif
 #endif
@@ -46,14 +54,14 @@ namespace les
 
 		ostringstream& ostr(void);
 		
-		void incDepth(void);
-		void decDepth(void);
+		void incTraceDepth(void);
+		void decTraceDepth(void);
 		int getTraceDepth(void);
 		void setTraceDepth(int depth);
 
-		bool tracingEnabled(void) const;
-		void startTracing(void);
-		void stopTracing(void);
+		bool traceEnabled(void) const;
+		void startTrace(void);
+		void stopTrace(void);
 
 		bool traceActive(void) const;
 		void traceActive(bool active);
@@ -85,12 +93,12 @@ namespace les
 		
 		int _traceDepth;
 		bool _traceActive;
-		bool _tracingEnabled;
+		bool _traceEnabled;
 
 		const char* _dir;
 		const char* _file;
 
-		static u_long _flags;
+		u_long _flags;
 		static pid_t _pid;
 	};
 }

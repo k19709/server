@@ -21,18 +21,18 @@ namespace les
 		~CTrace(void);
 
 	public:
-		static bool isTracing(void);
-		static void startTracing(void);
-		static void stopTracing(void);
+		static bool traceEnabled(void);
+		static void startTrace(void);
+		static void stopTrace(void);
 
-		static int getNestingIndent(void);
-		static void setNestingIndent(int indent);
+		static int getIndent(void);
+		static void setIndent(int indent);
 
 	private:
 		const char* _method;
 		
-		static int _enableTracing;
-		static int _nestingIndent;
+		static int _enabled;
+		static int _indent;
 
 		enum
 		{

@@ -1,5 +1,7 @@
 #include "socket/inetaddr.h"
 #include "socket/sockethelper.h"
+#include "log/logmsg.h"
+#include "util/error.h"
 
 namespace les
 {
@@ -11,16 +13,15 @@ namespace les
 	CInetAddr::CInetAddr(const CInetAddr& ref) : CAddr()
 	{
 		this->reset();
-		if (-1 == this->set(ref))
-		{
-		}
+		this->set(ref);
 	}
 
 	CInetAddr::CInetAddr(const sockaddr_in* saddr, int len) : CAddr()
 	{
 		this->reset();
-		if (-1 == this->set(saddr, len))
+		if (0 != this->set(saddr, len))
 		{
+			LES_ERROR("CInetAddr::CInetAddr() error")
 		}
 	}
 
@@ -30,6 +31,7 @@ namespace les
 		this->reset();
 		if (0 != this->set(port, hostName, true, af))
 		{
+			//LES_ERROR("CInetAddr::CInetAddr() error: " << getLastError() )
 		}
 	}
 
@@ -39,6 +41,7 @@ namespace les
 		this->reset();
 		if (0 != this->set(port, ipAddr))
 		{
+			LES_ERROR("CInetAddr::CInetAddr() error")
 		}
 	}
 
@@ -48,6 +51,7 @@ namespace les
 		this->reset();
 		if (0 != this->set(portName, hostName, protocol))
 		{
+			LES_ERROR("CInetAddr::CInetAddr() error: " << getLastError() )
 		}
 	}
 
@@ -57,6 +61,7 @@ namespace les
 		this->reset();
 		if (0 != this->set(portName, htonl(ipAddr), protocol))
 		{
+			LES_ERROR("CInetAddr::CInetAddr() error: " << getLastError() )
 		}
 	}
 
@@ -114,6 +119,7 @@ namespace les
 		if (hostName == 0)
 		{
 			// invalid hostName
+			LES_ERROR("CInetAddr::set() error: invalid hostName")
 			return -1;
 		}
 
@@ -285,11 +291,13 @@ namespace les
 		if (4 != len && 16 != len)
 		{
 			// input error
+			LES_ERROR("CInetAddr::setAddress() input error: len = " << len)
 			return -1;
 		}
 		if (4 != len && encode)
 		{
 			// input error
+			LES_ERROR("CInetAddr::setAddress() input error: len = " << len << " encode is true")
 			return -1;
 		}
 
@@ -334,6 +342,7 @@ namespace les
 			if (AF_INET6 != this->getType())
 			{
 				// input error
+				LES_ERROR("CInetAddr::setAddress() inout error: type = " << this->getType())
 				return -1;
 			}
 
