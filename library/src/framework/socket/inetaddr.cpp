@@ -19,50 +19,35 @@ namespace les
 	CInetAddr::CInetAddr(const sockaddr_in* saddr, int len) : CAddr()
 	{
 		this->reset();
-		if (0 != this->set(saddr, len))
-		{
-			LES_ERROR("CInetAddr::CInetAddr() error")
-		}
+		this->set(saddr, len);
 	}
 
 	CInetAddr::CInetAddr(u_short port, const char hostName[], int af /* = AF_UNSPEC */) : CAddr()
 	{
 		// the @a port is assumed to be in host byte order 
 		this->reset();
-		if (0 != this->set(port, hostName, true, af))
-		{
-			//LES_ERROR("CInetAddr::CInetAddr() error: " << getLastError() )
-		}
+		this->set(port, hostName, true, af);
 	}
 
 	CInetAddr::CInetAddr(u_short port, u_long ipAddr) : CAddr()
 	{
 		// the @a port and @a ipAddr are assumed to be in host byte order
 		this->reset();
-		if (0 != this->set(port, ipAddr))
-		{
-			LES_ERROR("CInetAddr::CInetAddr() error")
-		}
+		this->set(port, ipAddr);
 	}
 
 	CInetAddr::CInetAddr(const char portName, const char hostName, const char protocol[] /* = "tcp" */) : CAddr()
 	{
 		// if the @a protocol is tcp6, af select AF_INET6, otherwise af select AF_UNSPEC
 		this->reset();
-		if (0 != this->set(portName, hostName, protocol))
-		{
-			LES_ERROR("CInetAddr::CInetAddr() error: " << getLastError() )
-		}
+		this->set(portName, hostName, protocol);
 	}
 
 	CInetAddr::CInetAddr(const char portName, u_long ipAddr, const char protocol[] /* = "tcp" */) : CAddr()
 	{
 		// the @a ipAddr is assumed to be in host byte order
 		this->reset();
-		if (0 != this->set(portName, htonl(ipAddr), protocol))
-		{
-			LES_ERROR("CInetAddr::CInetAddr() error: " << getLastError() )
-		}
+		this->set(portName, htonl(ipAddr), protocol);
 	}
 
 	CInetAddr::~CInetAddr(void)
@@ -111,6 +96,7 @@ namespace les
 		}
 #endif
 
+		LES_ERROR("CInetAddr::set() error: sin_family = " << saddr->sin_family)
 		return -1;
 	}
 
@@ -142,6 +128,8 @@ namespace les
 					{
 						freeaddrinfo(result);	
 					}
+
+					LES_ERROR("CInetAddr::set() error: error code = " << getLastError())
 					return -1;
 				}
 				af = AF_INET;
@@ -159,6 +147,8 @@ namespace les
 				{
 					freeaddrinfo(result);	
 				}
+
+				LES_ERROR("CInetAddr::set() error: error code = " << getLastError())
 				return -1;
 			}
 		}
@@ -194,6 +184,8 @@ namespace les
 				{
 					freeaddrinfo(result);	
 				}
+
+				LES_ERROR("CInetAddr::set() error: error code = " << getLastError())
 				return -1;
 			}
 		}
@@ -208,6 +200,7 @@ namespace les
 			return 0;
 		}
 
+		LES_ERROR("CInetAddr::set() error: family = " << af)
 		return -1;
 	}
 
@@ -223,6 +216,7 @@ namespace les
 		int port = this->getPortFromPortName(portName, protocol);
 		if (-1 == port)
 		{
+			LES_ERROR("CInetAddr::set() error: portName = " << portName)
 			return -1;
 		}
 		
@@ -241,6 +235,7 @@ namespace les
 		int port = this->getPortFromPortName(portName, protocol);
 		if (-1 == port)
 		{
+			LES_ERROR("CInetAddr::set() error: portName = " << portName)
 			return -1;
 		}
 
@@ -291,13 +286,13 @@ namespace les
 		if (4 != len && 16 != len)
 		{
 			// input error
-			LES_ERROR("CInetAddr::setAddress() input error: len = " << len)
+			LES_ERROR("CInetAddr::setAddress() error: len = " << len)
 			return -1;
 		}
 		if (4 != len && encode)
 		{
 			// input error
-			LES_ERROR("CInetAddr::setAddress() input error: len = " << len << " encode is true")
+			LES_ERROR("CInetAddr::setAddress() error: len = " << len << " and encode is true")
 			return -1;
 		}
 
@@ -342,7 +337,7 @@ namespace les
 			if (AF_INET6 != this->getType())
 			{
 				// input error
-				LES_ERROR("CInetAddr::setAddress() inout error: type = " << this->getType())
+				LES_ERROR("CInetAddr::setAddress() error: type = " << this->getType())
 				return -1;
 			}
 
@@ -351,6 +346,8 @@ namespace les
 			memcpy(&this->_inetAddr._in6.sin6_addr, &ipAddr, len);
 			return 0;
 		}
+
+		LES_ERROR("CInetAddr::setAddress() error: len = " << len)
 		return -1;
 #endif
 	}
@@ -358,13 +355,14 @@ namespace les
 	int CInetAddr::getPortFromPortName(const char portName[], const char protocol[])
 	{
 		struct servent *p = NULL;
-		p = getservbyname(portName, protocol);
+		p = ::getservbyname(portName, protocol);
 		if (NULL != p)
 		{
 			// return the port which is network by order 
 			return p->s_port;
 		}
 
+		LES_ERROR("CInetAddr::getPortFromPortName() error: error code = " << getLastError())
 		return -1;
 	}
 

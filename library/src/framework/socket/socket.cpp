@@ -4,24 +4,18 @@
 
 namespace les
 {
-	CSocket::CSocket(void)
+	CSocket::CSocket(void) : _socket(INVALID_SOCKET)
 	{
 	}
 
 	CSocket::CSocket(int af, int type, int protocol, int reUseAddr)
 	{
-		if (0 != this->open(af, type, protocol, reUseAddr))
-		{
-			LES_ERROR("CSocket::CSocket() error: " << getLastError())
-		}
+		this->open(af, type, protocol, reUseAddr);
 	}
 
 	CSocket::CSocket(int af, int type, int protocol, LPWSAPROTOCOL_INFO info, GROUP g, DWORD flags, int reUseAddr)
 	{
-		if (0 != this->open(af, type, protocol, info, g, flags, reUseAddr))
-		{
-			LES_ERROR("CSocket::CSocket() error: " << getLastError())
-		}
+		this->open(af, type, protocol, info, g, flags, reUseAddr);
 	}
 
 	CSocket::~CSocket(void)
@@ -33,6 +27,7 @@ namespace les
 		// if successful, then return 0, otherwise return -1
 		if (SOCKET_ERROR == ::setsockopt(this->get(), level, optName, (const char*)optVal, optLen ))
 		{
+			LES_ERROR("CSocket::setOpt() error: error code = " << getLastError())
 			return -1;
 		}
 
@@ -44,6 +39,7 @@ namespace les
 		// if successful, then return 0, otherwise return -1
 		if (SOCKET_ERROR == ::getsockopt(this->get(), level, optName, (char*)optVal, optLen))
 		{
+			LES_ERROR("CSocket::getOpt() error: error code = " << getLastError())
 			return -1;
 		}
 
@@ -58,6 +54,7 @@ namespace les
 		
 		if (INVALID_SOCKET == this->get())
 		{
+			LES_ERROR("CSocket::open() error: error code = " << getLastError())
 			return -1;
 		}
 		else if (af != AF_UNIX 
@@ -67,6 +64,7 @@ namespace les
 								 &optVal,
 								 sizeof(optVal)) == -1 )
 		{
+			LES_ERROR("CSocket::open() error: error code = " << getLastError())
 			this->close();
 			return -1;
 		}
@@ -81,6 +79,7 @@ namespace les
 
 		if (INVALID_SOCKET == this->get())
 		{
+			LES_ERROR("CSocket::open() error: error code = " << getLastError())
 			return -1;
 		}
 		else if (reUseAddr
@@ -89,6 +88,7 @@ namespace les
 								 &optVal,
 								 sizeof(optVal)) == -1)
 		{
+			LES_ERROR("CSocket::open() error: error code = " << getLastError())
 			this->close();
 			return -1;
 		}
@@ -116,6 +116,7 @@ namespace les
 
 		if (SOCKET_ERROR == ::getpeername(this->get(), &sa, &len))
 		{
+			LES_ERROR("CSocket::getRomoteAddr() error: error code = " << getLastError())
 			return -1;
 		}
 		
@@ -131,6 +132,7 @@ namespace les
 
 		if (SOCKET_ERROR == ::getsockname(this->get(), &sa, &len))
 		{
+			LES_ERROR("CSocket::getLocalAddr() error: error code = " << getLastError())
 			return -1;
 		}
 
